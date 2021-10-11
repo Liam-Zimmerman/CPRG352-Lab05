@@ -15,6 +15,8 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+         getServletContext().getRequestDispatcher("/WEB-INF/viewnote.jsp").forward(request, response);
+         return;
     }
 
 
