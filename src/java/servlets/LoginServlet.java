@@ -9,19 +9,38 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import models.User;
-import service.AccountService;
+import services.AccountService;
 
 
 public class LoginServlet extends HttpServlet {
-
+    
+    HttpSession session;
+    User user;
+    String sessionUsername;
+    
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+            throws ServletException, IOException{
+              
+        if (request.getParameter("logout") != null) 
+        {
+            session.invalidate();
+            sessionUsername = null;
+            request.setAttribute("message", "Successfully logged out.");
+        }
         
-         getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
-         return;
+        if (sessionUsername == null)
+        {
+            getServletContext().getRequestDispatcher("/WEB-INF/login.jsp").forward(request, response);
+            return;
+        }
+        else
+        {
+            response.sendRedirect("home"); 
+        }
+            
+       
     }
-
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -42,7 +61,7 @@ public class LoginServlet extends HttpServlet {
         
         AccountService service = new AccountService();
         
-        User user = service.login(loginUsername, loginPassword);
+        user = service.login(loginUsername, loginPassword);
         
         if(user == (null))
         {
@@ -51,10 +70,12 @@ public class LoginServlet extends HttpServlet {
             return;
         }
         
-        HttpSession session = request.getSession();
-        
+        session = request.getSession(true);
+
         session.setAttribute("sessionUsername", user.getUsername());
         
-        response.sendRedirect("/MyLogin/home");     
+        sessionUsername = (String) session.getAttribute("sessionUsername");
+       
+        response.sendRedirect("home");     
     }
 }
